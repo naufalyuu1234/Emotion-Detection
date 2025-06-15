@@ -1,20 +1,19 @@
 import React from 'react';
+import { useRouter } from 'expo-router';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
-  Dimensions,
   StatusBar,
 } from 'react-native';
 import Svg, { Path, Defs, Marker, Polygon } from 'react-native-svg';
 
-const { width, height } = Dimensions.get('window');
-
 const EmotionDetectorWelcome = () => {
+  const router = useRouter();
+
   const handleContinue = () => {
-    // Handle navigation to next screen
-    console.log('Continue pressed');
+    router.push('/screens/GenderScreen');
   };
 
   return (
@@ -108,7 +107,6 @@ const EmotionDetectorWelcome = () => {
       <View style={styles.bottomContainer}>
         <Text style={styles.welcomeText}>Welcome</Text>
         <Text style={styles.subtitleText}>YOUR NEW EMOTION FACE DETECTOR APP</Text>
-        
         <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
           <Text style={styles.buttonText}>CONTINUE</Text>
         </TouchableOpacity>
