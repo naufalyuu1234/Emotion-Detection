@@ -100,7 +100,7 @@ const GenderIdentificationScreen = () => {
       
       {/* Header with Skip Button */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
+        <TouchableOpacity style={styles.skipButton} onPress={handleSkip} onPressIn={handleContinue}>
           <Text style={styles.skipText}>SKIP</Text>
         </TouchableOpacity>
       </View>

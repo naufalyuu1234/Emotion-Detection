@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRouter } from 'expo-router';
 import {
   View,
   Text,
@@ -9,6 +10,11 @@ import {
 } from 'react-native';
 
 const PurposeIdentificationScreen = () => {
+  const router = useRouter();
+  // Function to handle skip action
+  const handleContinue = () => {
+    router.push('/screens/ExpectScreen');
+  }
   const handleSkip = () => {
     console.log('Skip pressed');
   };
@@ -23,7 +29,7 @@ const PurposeIdentificationScreen = () => {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
+        <TouchableOpacity style={styles.skipButton} onPress={handleSkip} onPressIn={handleContinue}>
           <Text style={styles.skipText}>SKIP</Text>
         </TouchableOpacity>
       </View>
@@ -42,14 +48,17 @@ const PurposeIdentificationScreen = () => {
           <PurposeButton
             label="TO UNDERSTAND MY CURRENT EMOTIONS"
             onPress={() => handlePurposeSelect('UNDERSTAND_EMOTIONS')}
+            onPressIn={handleContinue}
           />
           <PurposeButton
             label="TO INCREASE EMOTIONAL AWARENESS"
             onPress={() => handlePurposeSelect('EMOTIONAL_AWARENESS')}
+            onPressIn={handleContinue}
           />
           <PurposeButton
             label="I PREFER NOT TO SAY"
             onPress={() => handlePurposeSelect('PREFER_NOT_TO_SAY')}
+            onPressIn={handleContinue}
           />
         </View>
       </View>
@@ -57,8 +66,8 @@ const PurposeIdentificationScreen = () => {
   );
 };
 
-const PurposeButton = ({ label, onPress }: { label: string; onPress: () => void }) => (
-  <TouchableOpacity style={styles.purposeButton} onPress={onPress}>
+const PurposeButton = ({ label, onPress, onPressIn }: { label: string; onPress: () => void, onPressIn: () => void }) => (
+  <TouchableOpacity style={styles.purposeButton} onPress={onPress} onPressIn={onPressIn}>
     <Text style={styles.buttonText}>{label}</Text>
   </TouchableOpacity>
 );
