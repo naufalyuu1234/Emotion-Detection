@@ -13,7 +13,7 @@ const ExpectIdentificationScreen = () => {
   const router = useRouter();
 
   const handleContinue = () => {
-    router.push("/screens/ExpectScreen");
+    router.push("/camera/InsertPhoto");
   };
   const handleSkip = () => {
     console.log("Skip pressed");
