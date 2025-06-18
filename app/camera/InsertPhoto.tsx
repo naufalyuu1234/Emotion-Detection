@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,18 +6,94 @@ import {
   StyleSheet,
   StatusBar,
   SafeAreaView,
+  Image,
+  ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import * as ImagePicker from 'expo-image-picker';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { detectEmotion } from '../../service/api';
+import { DetectionResponse } from '../../service/api';
 
 const PhotoInputScreen = () => {
+  const router = useRouter();
+  const params = useLocalSearchParams<{ 
+    selectedGender: string;
+    selectedPurpose: string;
+    selectedFeature: string;
+  }>();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
+
+  const handleImagePick = async (source: 'camera' | 'album') => {
+    try {
+      setLoading(true);
+      setError('');
+
+      // Request permission
+      const permissionResult = source === 'camera'
+        ? await ImagePicker.requestCameraPermissionsAsync()
+        : await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (!permissionResult.granted) {
+        setError('Permission to access camera/gallery was denied');
+        return;
+      }
+
+      // Launch camera/gallery
+      const result = source === 'camera'
+        ? await ImagePicker.launchCameraAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 0.8,
+            base64: true,
+          })
+        : await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 0.8,
+            base64: true,
+          });
+
+      if (!result.canceled && result.assets[0].base64) {
+        // Send to backend
+        const response = await detectEmotion(result.assets[0].base64);
+        
+        // Jika gender dipilih, gunakan gender yang dipilih
+        if (params.selectedGender && params.selectedGender !== 'PREFER_NOT_TO_SAY') {
+          response.faces = response.faces.map(face => ({
+            ...face,
+            gender: params.selectedGender.toLowerCase(),
+            genderConfidence: 100
+          }));
+        }
+
+        // Navigate to results screen with the detection data and user preferences
+        router.push({
+          pathname: '/screens/ResultScreen',
+          params: { 
+            detectionData: JSON.stringify(response),
+            selectedGender: params.selectedGender,
+            selectedPurpose: params.selectedPurpose,
+            selectedFeature: params.selectedFeature
+          }
+        });
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleCamera = () => {
-    // Handle camera action
-    console.log('Camera pressed');
+    handleImagePick('camera');
   };
 
   const handleAlbum = () => {
-    // Handle album action
-    console.log('Album pressed');
+    handleImagePick('album');
   };
 
   return (
@@ -28,9 +104,18 @@ const PhotoInputScreen = () => {
       <View style={styles.contentContainer}>
         {/* Title */}
         <Text style={styles.title}>Insert Your Photo</Text>
+
+        {/* Error message */}
+        {error ? (
+          <Text style={styles.errorText}>{error}</Text>
+        ) : null}
         
-        {/* Button Container */}
-        <View style={styles.buttonContainer}>
+        {/* Loading indicator */}
+        {loading ? (
+          <ActivityIndicator size="large" color="#fff" style={styles.loader} />
+        ) : (
+          /* Button Container */
+          <View style={styles.buttonContainer}>
           {/* Camera Button */}
           <TouchableOpacity 
             style={styles.actionButton} 
@@ -54,13 +139,23 @@ const PhotoInputScreen = () => {
               <Text style={styles.buttonText}>Album</Text>
             </View>
           </TouchableOpacity>
-        </View>
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  errorText: {
+    color: '#ff4444',
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  loader: {
+    marginVertical: 20,
+  },
   container: {
     flex: 1,
     backgroundColor: '#000',

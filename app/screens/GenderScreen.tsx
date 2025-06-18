@@ -81,18 +81,19 @@ const styles = StyleSheet.create({
 const GenderIdentificationScreen = () => {
     const router = useRouter();
 
-    const handleContinue = () => {
-        router.push('/screens/PurposeScreen');
-    };
+    const handleContinue = (selectedGender: string) => {
+    router.push({
+      pathname: '/screens/PurposeScreen',
+      params: { selectedGender }
+    });
+  };
 
   const handleSkip = () => {
-    // Handle skip action
-    console.log('Skip pressed');
+    handleContinue('PREFER_NOT_TO_SAY');
   };
 
   const handleGenderSelect = (gender: string) => {
-    // Handle gender selection
-    console.log('Selected gender:', gender);
+    handleContinue(gender);
   };
 
   return (
@@ -101,7 +102,7 @@ const GenderIdentificationScreen = () => {
       
       {/* Header with Skip Button */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.skipButton} onPress={handleSkip} onPressIn={handleContinue}>
+        <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
           <Text style={styles.skipText}>SKIP</Text>
         </TouchableOpacity>
       </View>
@@ -123,7 +124,6 @@ const GenderIdentificationScreen = () => {
           <TouchableOpacity 
             style={styles.genderButton} 
             onPress={() => handleGenderSelect('FEMALE')}
-            onPressIn={handleContinue}
           >
             <Text style={styles.buttonText}>FEMALE</Text>
           </TouchableOpacity>
@@ -131,7 +131,6 @@ const GenderIdentificationScreen = () => {
           <TouchableOpacity 
             style={styles.genderButton} 
             onPress={() => handleGenderSelect('MALE')}
-            onPressIn={handleContinue}
           >
             <Text style={styles.buttonText}>MALE</Text>
           </TouchableOpacity>
@@ -139,7 +138,6 @@ const GenderIdentificationScreen = () => {
           <TouchableOpacity 
             style={styles.genderButton} 
             onPress={() => handleGenderSelect('PREFER_NOT_TO_SAY')}
-            onPressIn={handleContinue}
           >
             <Text style={styles.buttonText}>I PREFER NOT TO SAY</Text>
           </TouchableOpacity>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import {
   View,
   Text,
@@ -11,16 +11,24 @@ import {
 
 const PurposeIdentificationScreen = () => {
   const router = useRouter();
-  // Function to handle skip action
-  const handleContinue = () => {
-    router.push('/screens/ExpectScreen');
+  const params = useLocalSearchParams<{ selectedGender: string }>();
+
+  const handleContinue = (purpose: string) => {
+    router.push({
+      pathname: '/screens/ExpectScreen',
+      params: { 
+        selectedGender: params.selectedGender,
+        selectedPurpose: purpose 
+      }
+    });
   }
+
   const handleSkip = () => {
-    console.log('Skip pressed');
+    handleContinue('PREFER_NOT_TO_SAY');
   };
 
   const handlePurposeSelect = (purpose: string) => {
-    console.log('Selected purpose:', purpose);
+    handleContinue(purpose);
   };
 
   return (
@@ -29,7 +37,7 @@ const PurposeIdentificationScreen = () => {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.skipButton} onPress={handleSkip} onPressIn={handleContinue}>
+        <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
           <Text style={styles.skipText}>SKIP</Text>
         </TouchableOpacity>
       </View>
@@ -48,17 +56,14 @@ const PurposeIdentificationScreen = () => {
           <PurposeButton
             label="TO UNDERSTAND MY CURRENT EMOTIONS"
             onPress={() => handlePurposeSelect('UNDERSTAND_EMOTIONS')}
-            onPressIn={handleContinue}
           />
           <PurposeButton
             label="TO INCREASE EMOTIONAL AWARENESS"
             onPress={() => handlePurposeSelect('EMOTIONAL_AWARENESS')}
-            onPressIn={handleContinue}
           />
           <PurposeButton
             label="I PREFER NOT TO SAY"
             onPress={() => handlePurposeSelect('PREFER_NOT_TO_SAY')}
-            onPressIn={handleContinue}
           />
         </View>
       </View>
@@ -66,8 +71,8 @@ const PurposeIdentificationScreen = () => {
   );
 };
 
-const PurposeButton = ({ label, onPress, onPressIn }: { label: string; onPress: () => void, onPressIn: () => void }) => (
-  <TouchableOpacity style={styles.purposeButton} onPress={onPress} onPressIn={onPressIn}>
+const PurposeButton = ({ label, onPress }: { label: string; onPress: () => void }) => (
+  <TouchableOpacity style={styles.purposeButton} onPress={onPress}>
     <Text style={styles.buttonText}>{label}</Text>
   </TouchableOpacity>
 );

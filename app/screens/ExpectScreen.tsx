@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import React from "react";
 import {
   SafeAreaView,
@@ -11,16 +11,25 @@ import {
 
 const ExpectIdentificationScreen = () => {
   const router = useRouter();
+  const params = useLocalSearchParams<{ selectedGender: string; selectedPurpose: string }>();
 
-  const handleContinue = () => {
-    router.push("/camera/InsertPhoto");
+  const handleContinue = (feature: string) => {
+    router.push({
+      pathname: "/camera/InsertPhoto",
+      params: {
+        selectedGender: params.selectedGender,
+        selectedPurpose: params.selectedPurpose,
+        selectedFeature: feature
+      }
+    });
   };
+
   const handleSkip = () => {
-    console.log("Skip pressed");
+    handleContinue('PREFER_NOT_TO_SAY');
   };
 
   const handleFeatureSelect = (feature: string) => {
-    console.log("Selected feature:", feature);
+    handleContinue(feature);
   };
 
   return (
@@ -46,17 +55,14 @@ const ExpectIdentificationScreen = () => {
           <FeatureButton
             label="REAL-TIME EMOTION DETECTION"
             onPress={() => handleFeatureSelect("REAL_TIME_DETECTION")}
-            onPressIn={handleContinue}
           />
           <FeatureButton
             label="DAILY/WEEKLY EMOTION REPORTS"
             onPress={() => handleFeatureSelect("REPORTS")}
-            onPressIn={handleContinue}
           />
           <FeatureButton
             label="TIPS OR ADVICE BASED ON EMOTIONS"
             onPress={() => handleFeatureSelect("TIPS")}
-            onPressIn={handleContinue}
           />
         </View>
       </View>
@@ -67,13 +73,11 @@ const ExpectIdentificationScreen = () => {
 const FeatureButton = ({
   label,
   onPress,
-  onPressIn,
 }: {
   label: string;
   onPress: () => void;
-  onPressIn?: () => void;
 }) => (
-  <TouchableOpacity style={styles.featureButton} onPress={onPress} onPressIn={onPressIn}>
+  <TouchableOpacity style={styles.featureButton} onPress={onPress}>
     <Text style={styles.buttonText}>{label}</Text>
   </TouchableOpacity>
 );
