@@ -7,6 +7,7 @@ import {
   StyleSheet,
   StatusBar,
   SafeAreaView,
+  Platform,
 } from 'react-native';
 
 const styles = StyleSheet.create({
@@ -18,7 +19,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     paddingHorizontal: 20,
-    paddingTop: 10,
+    paddingTop: StatusBar.currentHeight ? StatusBar.currentHeight + 10 : 30,
     paddingBottom: 20,
   },
   skipButton: {
